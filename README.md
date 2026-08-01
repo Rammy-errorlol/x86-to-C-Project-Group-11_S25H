@@ -75,7 +75,8 @@ This matches what we'd expect (for example, 64/255 is about 0.25, and 242/255 is
 
 **Screenshot of program output (with correctness check):**
 
-`[Insert screenshot of your Windows program.exe run here, e.g. ![output](docs/output.png)]`
+<img width="2318" height="1004" alt="image" src="https://github.com/user-attachments/assets/7cbad04b-8cdc-49ba-b0c1-402fab7a8fdb" />
+
 
 ### Performance Analysis
 
