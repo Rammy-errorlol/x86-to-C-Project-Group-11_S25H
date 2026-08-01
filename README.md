@@ -1,8 +1,6 @@
 # x86-to-C-Project-Group-11_S25H
 
-Converts an array of unsigned 8-bit grayscale pixel values (0–255) into
-normalized 32-bit floats (0.0–1.0), implemented in hand-written x86-64
-assembly and validated against a C reference implementation.
+This project converts an array of unsigned 8-bit grayscale pixel values (0 to 255) into normalized 32-bit floats (0.0 to 1.0). The conversion itself is done in hand-written x86-64 assembly, and we checked the results against a C reference implementation to make sure everything lines up.
 
 ## Function Signature
 
@@ -10,7 +8,7 @@ assembly and validated against a C reference implementation.
 void imgCvtGrayInttoFloat(int height, int width, const unsigned char *input, float *output);
 ```
 
-Each output pixel is computed as `output[i] = (float)input[i] / 255.0f`.
+Each output pixel is calculated as `output[i] = (float)input[i] / 255.0f`.
 
 **Calling convention:** Windows x64 (fastcall)
 | Argument | Register |
@@ -20,18 +18,14 @@ Each output pixel is computed as `output[i] = (float)input[i] / 255.0f`.
 | `input`  | R8  |
 | `output` | R9  |
 
-> Note: the current `.asm` targets the **Windows x64 calling convention**
-> and the provided `program.exe` is a Windows PE32+ binary. It will not
-> run as-is on Linux/macOS. To test on a non-Windows machine, the
-> argument registers must be re-mapped to the System V AMD64 ABI
-> (RDI/RSI/RDX/RCX) before assembling.
+Note that the `.asm` file is written for the Windows x64 calling convention, and `program.exe` is a Windows PE32+ binary. It won't run as is on Linux or macOS. If you want to test it on a non-Windows machine, you'd need to remap the argument registers to the System V AMD64 ABI (RDI, RSI, RDX, RCX) before assembling.
 
 ## Files
 
 | File | Description |
 |---|---|
 | `imgCvtGrayInttoFloat..asm` | Assembly implementation of the conversion routine |
-| `main.c` | Test/benchmark driver: demo run, correctness check, and timing benchmarks |
+| `main.c` | Test and benchmark driver: runs the demo, checks correctness, and times performance |
 | `imgCvtGrayInttoFloat.obj` | Pre-built object file (Windows) |
 | `program.exe` | Pre-built executable (Windows) |
 
@@ -43,54 +37,41 @@ gcc main.c imgCvtGrayInttoFloat.obj -o program.exe -lm
 program.exe
 ```
 
-(Adjust the assembler invocation to match whichever tool you used —
-NASM, MASM, or the SASM IDE mentioned in the source comments.)
+Adjust the assembler command depending on which tool you're using (NASM, MASM, or the SASM IDE mentioned in the source comments).
 
 ## Test Methodology
 
-1. **Demo test** — a fixed 3×4 sample matrix is converted and printed so
-   the output can be checked by hand against `pixel / 255`.
-2. **Correctness check** — for each benchmark size, the assembly output
-   is compared element-by-element against a C reference implementation
-   (`c_imgCvtGrayInttoFloat`), with a tolerance of `1e-4`.
-3. **Performance benchmark** — the assembly routine is run 30 times per
-   input size and the average execution time is reported, for sizes
-   10×10, 100×100, and 1000×1000.
+1. **Demo test**: a fixed 3x4 sample matrix gets converted and printed so you can check the output by hand against `pixel / 255`.
+2. **Correctness check**: for each benchmark size, the assembly output is compared pixel by pixel against a C reference implementation (`c_imgCvtGrayInttoFloat`), allowing a tolerance of `1e-4`.
+3. **Performance benchmark**: the assembly routine runs 30 times per input size, and we report the average execution time for 10x10, 100x100, and 1000x1000 inputs.
 
 ## Results
 
-> ⚠️ **Placeholder numbers below.** These were captured by porting the
-> routine to the System V calling convention and running it on Linux,
-> since the original binary is Windows-only and could not be executed
-> in this environment. The assembly logic itself is unchanged — only
-> the argument registers were remapped to match the Linux ABI. **Replace
-> these with the output of your own Windows `program.exe` run before
-> submitting**, since timing is sensitive to OS and hardware, and the
-> rubric requires a real screenshot (see below), not just typed numbers.
+Placeholder numbers below. These came from porting the routine to the System V calling convention and running it on Linux, since the original binary is Windows only and couldn't be run in that environment. The assembly logic itself wasn't changed, only the argument registers were remapped to fit the Linux ABI. Swap these out with the output from your own Windows `program.exe` run before submitting, since timing depends a lot on the OS and hardware, and the rubric asks for an actual screenshot rather than typed numbers.
 
-**Demo output (3×4 matrix):**
+**Demo output (3x4 matrix):**
 ```
 0.25 0.35 0.45 0.33
 0.55 0.65 0.75 0.33
 0.85 0.95 0.15 0.33
 ```
-Matches expected values (e.g. 64/255 ≈ 0.25, 242/255 ≈ 0.95).
+This matches what we'd expect (for example, 64/255 is about 0.25, and 242/255 is about 0.95).
 
 **Correctness checks:**
 
 | Size | Result |
 |---|---|
-| 10×10 | PASSED |
-| 100×100 | PASSED |
-| 1000×1000 | PASSED |
+| 10x10 | PASSED |
+| 100x100 | PASSED |
+| 1000x1000 | PASSED |
 
 **Average execution time (30 runs each):**
 
-| Size | Pixels | Avg. Time | Time/Pixel |
+| Size | Pixels | Avg. Time | Time per Pixel |
 |---|---|---|---|
-| 10×10 | 100 | ~0.0007 ms | ~7 ns |
-| 100×100 | 10,000 | ~0.050 ms | ~5 ns |
-| 1000×1000 | 1,000,000 | ~4.87 ms | ~4.9 ns |
+| 10x10 | 100 | ~0.0007 ms | ~7 ns |
+| 100x100 | 10,000 | ~0.050 ms | ~5 ns |
+| 1000x1000 | 1,000,000 | ~4.87 ms | ~4.9 ns |
 
 **Screenshot of program output (with correctness check):**
 
@@ -98,43 +79,25 @@ Matches expected values (e.g. 64/255 ≈ 0.25, 242/255 ≈ 0.95).
 
 ### Performance Analysis
 
-Execution time scales approximately linearly with pixel count, which
-is expected: the assembly loop processes exactly one pixel per
-iteration (`movzx` → `cvtsi2ss` → `divss` → `movss`, then increment
-pointers and loop), with no batching or vectorization across multiple
-pixels. Since each iteration does a fixed, constant amount of work
-regardless of input size, total time is proportional to `height *
-width`. The per-pixel cost stays roughly flat (~5–7 ns/pixel) across
-all three input sizes, which is consistent with there being no
-significant fixed overhead outside the loop (e.g. no large setup cost
-that would dominate at small sizes, and no cache/memory bottleneck
-that would inflate cost at large sizes for this data volume). A likely
-next optimization would be to use packed SIMD instructions (e.g.
-`cvtdq2ps`/`divps` on 4 pixels at once) instead of scalar SIMD, which
-could reduce the per-pixel cost by processing multiple pixels per
-instruction.
+Execution time scales pretty much linearly with pixel count, which makes sense given how the loop is written. The assembly processes exactly one pixel per iteration (`movzx`, then `cvtsi2ss`, `divss`, `movss`, then it bumps the pointers and loops again), and there's no batching or vectorization across multiple pixels. Since each iteration does the same fixed amount of work no matter how big the input is, total time ends up proportional to `height * width`. The time per pixel stays fairly flat, somewhere around 5 to 7 ns, across all three sizes we tested. That tells us there isn't much fixed overhead outside the loop weighing things down at small sizes, and no real memory or cache bottleneck showing up at the larger size either, at least not at this data volume. If we wanted to speed this up further, switching from scalar SIMD to packed SIMD instructions (like `cvtdq2ps` and `divps` to handle four pixels at once) would be the natural next step, since it should cut the per-pixel cost by processing several pixels per instruction instead of one.
 
 ### Demo Video
 
-`[Insert link to your 5–10 minute video here, showing source code, compilation, and execution of the C and x86-64 program]`
+`[Insert link to your 5-10 minute video here, showing source code, compilation, and execution of the C and x86-64 program]`
 
 ## Design Notes
 
-- Uses SSE scalar instructions (`cvtsi2ss`, `divss`, `movss`) to convert
-  and scale each pixel.
-- Processes one pixel per loop iteration (no SIMD/vectorized batch
-  processing).
-- Loop uses a simple decrement-and-branch (`dec` / `jnz`) with no
-  unnecessary branching inside the hot path.
+- Uses SSE scalar instructions (`cvtsi2ss`, `divss`, `movss`) to convert and scale each pixel.
+- Processes one pixel per loop iteration, no SIMD or vectorized batch processing.
+- The loop uses a simple decrement and branch (`dec` / `jnz`) with no unnecessary branching in the hot path.
 
 ## Known Limitations
 
-- Windows-only build as provided (Windows x64 calling convention).
-- No SIMD vectorization — could be optimized further with SSE/AVX to
-  process multiple pixels per iteration.
-- No input validation beyond the `height * width <= 0` early-return
-  check.
+- Builds for Windows only as provided, since it uses the Windows x64 calling convention.
+- No SIMD vectorization yet. This could be optimized further with SSE or AVX to handle multiple pixels per iteration.
+- No input validation beyond the `height * width <= 0` early return check.
 
 ## Group Members
 
-- [Add names / student IDs here]
+- Joshua Carlos Samonte
+- Ram Imperial
