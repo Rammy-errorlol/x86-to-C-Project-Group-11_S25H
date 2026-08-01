@@ -59,13 +59,14 @@ NASM, MASM, or the SASM IDE mentioned in the source comments.)
 
 ## Results
 
-Results below were captured by porting the routine to the System V
-calling convention and running it on Linux, since the original binary
-is Windows-only and could not be executed in this environment. The
-assembly logic itself is unchanged — only the argument registers were
-remapped to match the Linux ABI. **These numbers are for reference
-only; replace them with the output of your own Windows `program.exe`
-run before submitting**, since timing is sensitive to OS and hardware.
+> ⚠️ **Placeholder numbers below.** These were captured by porting the
+> routine to the System V calling convention and running it on Linux,
+> since the original binary is Windows-only and could not be executed
+> in this environment. The assembly logic itself is unchanged — only
+> the argument registers were remapped to match the Linux ABI. **Replace
+> these with the output of your own Windows `program.exe` run before
+> submitting**, since timing is sensitive to OS and hardware, and the
+> rubric requires a real screenshot (see below), not just typed numbers.
 
 **Demo output (3×4 matrix):**
 ```
@@ -85,15 +86,37 @@ Matches expected values (e.g. 64/255 ≈ 0.25, 242/255 ≈ 0.95).
 
 **Average execution time (30 runs each):**
 
-| Size | Pixels | Avg. Time |
-|---|---|---|
-| 10×10 | 100 | ~0.0007 ms |
-| 100×100 | 10,000 | ~0.050 ms |
-| 1000×1000 | 1,000,000 | ~4.87 ms |
+| Size | Pixels | Avg. Time | Time/Pixel |
+|---|---|---|---|
+| 10×10 | 100 | ~0.0007 ms | ~7 ns |
+| 100×100 | 10,000 | ~0.050 ms | ~5 ns |
+| 1000×1000 | 1,000,000 | ~4.87 ms | ~4.9 ns |
+
+**Screenshot of program output (with correctness check):**
+
+`[Insert screenshot of your Windows program.exe run here, e.g. ![output](docs/output.png)]`
+
+### Performance Analysis
 
 Execution time scales approximately linearly with pixel count, which
-is expected for a simple single-pixel-per-iteration loop with no
-vectorization.
+is expected: the assembly loop processes exactly one pixel per
+iteration (`movzx` → `cvtsi2ss` → `divss` → `movss`, then increment
+pointers and loop), with no batching or vectorization across multiple
+pixels. Since each iteration does a fixed, constant amount of work
+regardless of input size, total time is proportional to `height *
+width`. The per-pixel cost stays roughly flat (~5–7 ns/pixel) across
+all three input sizes, which is consistent with there being no
+significant fixed overhead outside the loop (e.g. no large setup cost
+that would dominate at small sizes, and no cache/memory bottleneck
+that would inflate cost at large sizes for this data volume). A likely
+next optimization would be to use packed SIMD instructions (e.g.
+`cvtdq2ps`/`divps` on 4 pixels at once) instead of scalar SIMD, which
+could reduce the per-pixel cost by processing multiple pixels per
+instruction.
+
+### Demo Video
+
+`[Insert link to your 5–10 minute video here, showing source code, compilation, and execution of the C and x86-64 program]`
 
 ## Design Notes
 
