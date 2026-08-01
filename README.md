@@ -101,4 +101,4 @@ Execution time scales pretty much linearly with pixel count, which makes sense g
 ## Group Members
 
 - Joshua Carlos Samonte
-- Ram Imperial
+- Ram Miguel Liwanag
