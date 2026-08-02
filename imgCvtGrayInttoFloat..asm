@@ -8,7 +8,6 @@ const255:
 section .text
 global imgCvtGrayInttoFloat
 
-; ===========================================================
 ; void imgCvtGrayInttoFloat(
 ;     int height,
 ;     int width,
@@ -21,8 +20,6 @@ global imgCvtGrayInttoFloat
 ; RDX = width
 ; R8  = input pointer
 ; R9  = output pointer
-;
-; ===========================================================
 
 imgCvtGrayInttoFloat:
 
