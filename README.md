@@ -1,6 +1,6 @@
 # x86-to-C-Project-Group-11_S25H
 
-This project converts an array of unsigned 8-bit grayscale pixel values (0 to 255) into normalized 32-bit floats (0.0 to 1.0). The conversion itself is done in hand-written x86-64 assembly, and we checked the results against a C reference implementation to make sure everything lines up.
+This project converts an array of unsigned 8-bit grayscale pixel values (0 to 255) into normalized 32-bit floats (0.0 to 1.0). The conversion itself is done in hand-written x86-64 assembly, and we checked the results against a C reference implementation to make sure everything lines up. This project implementation is for fulfillment of our LBYARCH course under Sir Carlo Adriano.
 
 ## Function Signature
 
@@ -88,10 +88,9 @@ Execution time scales pretty much linearly with pixel count, which makes sense g
 `[Insert link to your 5-10 minute video here, showing source code, compilation, and execution of the C and x86-64 program]`
 
 ## Design Notes
-
-- Uses SSE scalar instructions (`cvtsi2ss`, `divss`, `movss`) to convert and scale each pixel.
-- Processes one pixel per loop iteration, no SIMD or vectorized batch processing.
-- The loop uses a simple decrement and branch (`dec` / `jnz`) with no unnecessary branching in the hot path.
+- Uses scalar SSE (SIMD) registers (`xmm0` and `xmm1`) together with the scalar floating-point instructions `cvtsi2ss`, `divss`, and `movss` to convert each -pixel from an unsigned 8-bit integer to a single-precision floating-point value.
+- Processes one pixel per loop iteration using scalar operations rather than packed/vectorized SIMD instructions.
+- Uses a simple counted loop with `dec` and `jnz` to minimize loop overhead while converting all pixels.
 
 ## Known Limitations
 
