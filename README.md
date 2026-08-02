@@ -95,7 +95,7 @@ Execution time scales pretty much linearly with pixel count, which makes sense g
 ## Known Limitations
 
 - Builds for Windows only as provided, since it uses the Windows x64 calling convention.
-- No SIMD vectorization yet. This could be optimized further with SSE or AVX to handle multiple pixels per iteration.
+- Uses scalar SSE instructions to process one pixel at a time. Performance could be improved by using packed SSE or AVX instructions to process multiple pixels simultaneously.
 - No input validation beyond the `height * width <= 0` early return check.
 
 ## Group Members
