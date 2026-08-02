@@ -70,8 +70,8 @@ This matches what we'd expect (for example, 64/255 is about 0.25, and 242/255 is
 
 | Size | Pixels | Avg. Time | Time per Pixel |
 |---|---|---|---|
-| 10x10 | 100 | ~0.0000 ms | ~7 ns |
-| 100x100 | 10,000 | ~0.003 ms | ~5 ns |
+| 10x10 | 100 | ~0.00 ms | ~7 ns |
+| 100x100 | 10,000 | ~0.03 ms | ~5 ns |
 | 1000x1000 | 1,000,000 | ~3.23 ms | ~4.9 ns |
 
 **Screenshot of program output (with correctness check):**
