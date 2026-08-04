@@ -32,8 +32,8 @@ Note that the `.asm` file is written for the Windows x64 calling convention, and
 ## Build Instructions (Windows / MASM-MinGW64)
 
 ```
-nasm -f win64 imgCvtGrayInttoFloat..asm -o imgCvtGrayInttoFloat.obj OR
-"C:\Program Files (x86)\SASM\NASM\nasm.exe" -f win64 "imgCvtGrayInttoFloat..asm" -o imgCvtGrayInttoFloat.obj
+nasm -f win64 imgCvtGrayInttoFloat.asm -o imgCvtGrayInttoFloat.obj OR
+"C:\Program Files (x86)\SASM\NASM\nasm.exe" -f win64 "imgCvtGrayInttoFloat.asm" -o imgCvtGrayInttoFloat.obj
 gcc main.c imgCvtGrayInttoFloat.obj -o program.exe -lm
 program.exe
 ```
