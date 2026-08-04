@@ -2,60 +2,43 @@ default rel
 
 section .data
 align 4
-const255:
-    dd 255.0
+const255: dd 255.0                  ; 32-bit float constant (255.0f)
 
 section .text
 global imgCvtGrayInttoFloat
 
-; void imgCvtGrayInttoFloat(
-;     int height,
-;     int width,
-;     const unsigned char *input,
-;     float *output
-; );
-;
-; Windows x64 Calling Convention (SASM MinGW64)
-; RCX = height
-; RDX = width
-; R8  = input pointer
-; R9  = output pointer
-
 imgCvtGrayInttoFloat:
+    ; 1. Calculate total_pixels = height * width
+    mov eax, ecx                    ; eax = height (from RCX)
+    imul eax, edx                   ; eax = height * width (from RDX)
 
-    ; Compute total pixels = height * width
-    mov eax, ecx
-    imul eax, edx
-
-    ; If total <= 0, return
+    ; 2. Check if total pixels <= 0
     test eax, eax
-    jle done
+    jle .done
 
-    ; Load constant 255.0f into XMM1
+    ; 3. Load 255.0f scalar into XMM1
     movss xmm1, [const255]
 
-loop_pixels:
+.loop_start:
+    ; 4. Read unsigned 8-bit byte from R8 pointer (zero-extended into R10D)
+    movzx r10d, byte [r8]
 
-    ; Load unsigned byte pixel
-    movzx edx, byte [r8]
+    ; 5. Scalar SIMD conversion: int -> single precision float (XMM0)
+    cvtsi2ss xmm0, r10d
 
-    ; Integer -> float
-    cvtsi2ss xmm0, edx
-
-    ; Divide by 255.0
+    ; 6. Scalar SIMD division: xmm0 = pixel / 255.0f
     divss xmm0, xmm1
 
-    ; Store float result
+    ; 7. Write float result to memory address at R9 pointer
     movss [r9], xmm0
 
-    ; Advance pointers
-    inc r8
-    add r9, 4
+    ; 8. Advance pointers
+    inc r8                          ; byte pointer ++
+    add r9, 4                       ; float pointer += 4 bytes
 
-    ; Loop
+    ; 9. Loop decrement
     dec eax
-    jnz loop_pixels
+    jnz .loop_start
 
-done:
-    ret
+.done:
     ret
