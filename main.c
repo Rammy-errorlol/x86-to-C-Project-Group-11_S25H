@@ -76,9 +76,7 @@ int main(void) {
 
     int height, width;
 
-    printf("===================================================\n");
-    printf("     GRAYSCALE INT-TO-FLOAT CONVERTER (x86 SIMD)   \n");
-    printf("===================================================\n\n");
+    printf("GRAYSCALE INT-TO-FLOAT CONVERTER (x86 SIMD)\n");
 
     printf("Enter Image Height: ");
     if (scanf("%d", &height) != 1 || height <= 0) {
@@ -124,10 +122,7 @@ int main(void) {
     free(user_output);
 
     // Run Automated Benchmarks
-    printf("\n===================================================\n");
-    printf("               BENCHMARK SUITE (30 RUNS)           \n");
-    printf("===================================================\n");
-    
+    printf("BENCHMARK SUITE (30 RUNS)\n");
     benchmark_asm(10, 10);
     benchmark_asm(100, 100);
     benchmark_asm(1000, 1000);
